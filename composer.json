@@ -1,0 +1,58 @@
+{
+    "name": "nks-hub/nette-cloudflare-r2",
+    "description": "Cloudflare R2 storage integration for Nette Framework with full S3-compatible API support",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "nette",
+        "cloudflare",
+        "r2",
+        "s3",
+        "storage",
+        "cloud",
+        "upload",
+        "cdn"
+    ],
+    "authors": [
+        {
+            "name": "NKS Hub",
+            "email": "dev@nks-hub.com"
+        }
+    ],
+    "homepage": "https://github.com/nks-hub/nette-cloudflare-r2",
+    "require": {
+        "php": ">=7.4",
+        "nette/di": "^3.0",
+        "nette/schema": "^1.2",
+        "nette/utils": "^3.2 || ^4.0",
+        "nette/http": "^3.1",
+        "aws/aws-sdk-php": "^3.0"
+    },
+    "require-dev": {
+        "nette/tester": "^2.4",
+        "phpstan/phpstan": "^1.10",
+        "tracy/tracy": "^2.9"
+    },
+    "suggest": {
+        "tracy/tracy": "For Tracy debugger panel integration"
+    },
+    "autoload": {
+        "psr-4": {
+            "NksHub\\NetteCloudflareR2\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NksHub\\NetteCloudflareR2\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
