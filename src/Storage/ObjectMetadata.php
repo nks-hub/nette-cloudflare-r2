@@ -50,9 +50,13 @@ final class ObjectMetadata
     {
         $lastModified = null;
         if (isset($data['LastModified'])) {
-            $lastModified = $data['LastModified'] instanceof DateTimeImmutable
-                ? $data['LastModified']
-                : new DateTimeImmutable($data['LastModified']);
+            if ($data['LastModified'] instanceof DateTimeImmutable) {
+                $lastModified = $data['LastModified'];
+            } elseif ($data['LastModified'] instanceof \DateTimeInterface) {
+                $lastModified = DateTimeImmutable::createFromInterface($data['LastModified']);
+            } elseif (is_string($data['LastModified'])) {
+                $lastModified = new DateTimeImmutable($data['LastModified']);
+            }
         }
 
         return new self(
