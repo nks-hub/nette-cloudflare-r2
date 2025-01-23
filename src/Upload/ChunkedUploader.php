@@ -166,7 +166,7 @@ class ChunkedUploader
             $uploaded = $uploadedBytes;
 
             while (!feof($handle)) {
-                $chunk = fread($handle, $chunkSize);
+                $chunk = fread($handle, max(1, $chunkSize));
                 if ($chunk === false || $chunk === '') {
                     break;
                 }

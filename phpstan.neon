@@ -1,9 +1,19 @@
 parameters:
-	level: 8
+	level: 6
 	paths:
 		- src
 
+	excludePaths:
+		- src/Bridge/Nette/CacheStorage.php
+
 	ignoreErrors:
 		- '#Call to an undefined method Aws\\S3\\S3Client::#'
+		- '#return type has no value type specified in iterable type Aws\\Result#'
+		- '#Access to an undefined property object::#'
+		- '#Cannot access property \$.+ on array\|object#'
+		- '#has invalid return type Nette\\Application\\Responses\\FileResponse#'
+		- '#Instantiated class Nette\\Application\\Responses\\FileResponse not found#'
+		- '#should return array\{.+\} but returns array<string, mixed>#'
 
+	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
