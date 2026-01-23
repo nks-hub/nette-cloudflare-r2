@@ -25,34 +25,34 @@ class R2ClientFactory
     /**
      * Create client for a named bucket from configuration.
      */
-    public function create(string $bucketName): R2Client
+    public function create(string $name): R2Client
     {
-        if (isset($this->clients[$bucketName])) {
-            return $this->clients[$bucketName];
+        if (isset($this->clients[$name])) {
+            return $this->clients[$name];
         }
 
-        if (!isset($this->config->buckets[$bucketName])) {
-            throw new \InvalidArgumentException("Bucket '$bucketName' is not configured.");
+        if (!isset($this->config->buckets[$name])) {
+            throw new \InvalidArgumentException("Bucket '$name' is not configured.");
         }
 
-        $bucketConfig = $this->config->buckets[$bucketName];
+        $bucketConfig = $this->config->buckets[$name];
 
         $configuration = new Configuration(
             $this->config->accountId,
             $this->config->accessKeyId,
             $this->config->secretAccessKey,
-            $bucketConfig->name,
-            $bucketConfig->publicUrl ?? $this->config->publicUrl ?? null,
+            $bucketConfig->bucket,
+            $bucketConfig->publicUrl ?? null,
             $this->config->jurisdiction ?? null,
             $bucketConfig->storageClass ?? $this->config->upload->storageClass ?? StorageClass::STANDARD,
-            $this->config->upload->cacheControl ?? null,
+            $bucketConfig->cacheControl ?? $this->config->upload->cacheControl ?? null,
             $this->config->upload->chunkSize ?? 8388608,
             $this->config->upload->autoMultipart ?? true
         );
 
-        $this->clients[$bucketName] = new R2Client($configuration);
+        $this->clients[$name] = new R2Client($configuration);
 
-        return $this->clients[$bucketName];
+        return $this->clients[$name];
     }
 
     /**
@@ -68,7 +68,7 @@ class R2ClientFactory
             $this->config->accessKeyId,
             $this->config->secretAccessKey,
             $bucketName,
-            $publicUrl ?? $this->config->publicUrl ?? null,
+            $publicUrl,
             $this->config->jurisdiction ?? null,
             $storageClass,
             $this->config->upload->cacheControl ?? null,
@@ -77,5 +77,23 @@ class R2ClientFactory
         );
 
         return new R2Client($configuration);
+    }
+
+    /**
+     * Get all configured bucket names.
+     *
+     * @return string[]
+     */
+    public function getBucketNames(): array
+    {
+        return array_keys((array) $this->config->buckets);
+    }
+
+    /**
+     * Check if a bucket is configured.
+     */
+    public function hasBucket(string $name): bool
+    {
+        return isset($this->config->buckets[$name]);
     }
 }
