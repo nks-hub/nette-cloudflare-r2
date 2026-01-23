@@ -31,11 +31,12 @@ class R2ClientFactory
             return $this->clients[$name];
         }
 
-        if (!isset($this->config->buckets[$name])) {
+        $buckets = (array) $this->config->buckets;
+        if (!isset($buckets[$name])) {
             throw new \InvalidArgumentException("Bucket '$name' is not configured.");
         }
 
-        $bucketConfig = $this->config->buckets[$name];
+        $bucketConfig = $buckets[$name];
 
         $configuration = new Configuration(
             $this->config->accountId,
@@ -94,6 +95,7 @@ class R2ClientFactory
      */
     public function hasBucket(string $name): bool
     {
-        return isset($this->config->buckets[$name]);
+        $buckets = (array) $this->config->buckets;
+        return isset($buckets[$name]);
     }
 }
