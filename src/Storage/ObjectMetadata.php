@@ -52,8 +52,14 @@ final class ObjectMetadata
         if (isset($data['LastModified'])) {
             if ($data['LastModified'] instanceof DateTimeImmutable) {
                 $lastModified = $data['LastModified'];
+            } elseif ($data['LastModified'] instanceof \DateTime) {
+                $lastModified = DateTimeImmutable::createFromMutable($data['LastModified']);
             } elseif ($data['LastModified'] instanceof \DateTimeInterface) {
-                $lastModified = DateTimeImmutable::createFromInterface($data['LastModified']);
+                // PHP 7.4 compatible - format and re-parse
+                $lastModified = new DateTimeImmutable(
+                    $data['LastModified']->format('Y-m-d H:i:s.u'),
+                    $data['LastModified']->getTimezone()
+                );
             } elseif (is_string($data['LastModified'])) {
                 $lastModified = new DateTimeImmutable($data['LastModified']);
             }
