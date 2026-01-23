@@ -26,7 +26,7 @@
         "nette/schema": "^1.2",
         "nette/utils": "^3.2 || ^4.0",
         "nette/http": "^3.0",
-        "aws/aws-sdk-php": "^3.0"
+        "aws/aws-sdk-php": "^3.0 <3.280"
     },
     "require-dev": {
         "nette/tester": "^2.4",
