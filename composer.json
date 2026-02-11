@@ -16,7 +16,7 @@
     "authors": [
         {
             "name": "NKS Hub",
-            "email": "dev@nks-hub.com"
+            "email": "dev@nks-hub.cz"
         }
     ],
     "homepage": "https://github.com/nks-hub/nette-cloudflare-r2",
