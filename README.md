@@ -1,5 +1,7 @@
 # Nette Cloudflare R2
 
+[![Latest Stable Version](https://poser.pugx.org/nks-hub/nette-cloudflare-r2/v)](https://packagist.org/packages/nks-hub/nette-cloudflare-r2)
+[![Total Downloads](https://poser.pugx.org/nks-hub/nette-cloudflare-r2/downloads)](https://packagist.org/packages/nks-hub/nette-cloudflare-r2)
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-8892BF.svg)](https://php.net/)
 [![Nette Version](https://img.shields.io/badge/nette-%5E3.0-blue.svg)](https://nette.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -447,19 +449,31 @@ Cloudflare R2 offers significant cost savings:
 ## Testing
 
 ```bash
-# Run tests
 ./vendor/bin/tester tests
-
-# With coverage
-./vendor/bin/tester tests -c php.ini --coverage coverage.html
 ```
+
+## Contributing
+
+Contributions are welcome! For major changes, please open an issue first.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: description'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Support
+
+- 📧 **Email:** dev@nks-hub.cz
+- 🐛 **Bug reports:** [GitHub Issues](https://github.com/nks-hub/nette-cloudflare-r2/issues)
+- 📖 **Cloudflare R2:** [cloudflare.com/products/r2](https://www.cloudflare.com/products/r2/)
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
-## Credits
+---
 
-- Built for [Nette Framework](https://nette.org/)
-- Uses [AWS SDK for PHP](https://aws.amazon.com/sdk-for-php/)
-- Powered by [Cloudflare R2](https://www.cloudflare.com/products/r2/)
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/nks-hub">NKS Hub</a>
+</p>
