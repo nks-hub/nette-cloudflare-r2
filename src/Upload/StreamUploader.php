@@ -33,15 +33,105 @@ class StreamUploader
     }
 
     /**
+     * Validate URL against SSRF attack vectors.
+     *
+     * Blocks non-HTTP(S) schemes and private/reserved IP ranges.
+     *
+     * @throws \InvalidArgumentException on disallowed scheme or private/internal host
+     */
+    private function validateUrl(string $url): void
+    {
+        $parsed = parse_url($url);
+
+        if ($parsed === false || !isset($parsed['scheme'], $parsed['host'])) {
+            throw new \InvalidArgumentException('Invalid URL format.');
+        }
+
+        $scheme = strtolower($parsed['scheme']);
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            throw new \InvalidArgumentException("URL scheme '{$scheme}' is not allowed. Only http and https are permitted.");
+        }
+
+        $host = $parsed['host'];
+
+        // Resolve hostname to IP for private-range checks
+        $ip = filter_var($host, FILTER_VALIDATE_IP) !== false ? $host : gethostbyname($host);
+
+        if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            throw new \InvalidArgumentException("Cannot resolve host '{$host}'.");
+        }
+
+        // Block private, loopback, link-local and reserved ranges
+        $blockedRanges = [
+            // Loopback
+            '127.0.0.0/8',
+            // Private class A
+            '10.0.0.0/8',
+            // Private class B
+            '172.16.0.0/12',
+            // Private class C
+            '192.168.0.0/16',
+            // Link-local / AWS metadata
+            '169.254.0.0/16',
+            // IPv6 loopback
+            '::1/128',
+            // IPv6 link-local
+            'fe80::/10',
+            // IPv6 unique local
+            'fc00::/7',
+        ];
+
+        foreach ($blockedRanges as $cidr) {
+            if ($this->ipInCidr($ip, $cidr)) {
+                throw new \InvalidArgumentException("URL resolves to a private or reserved IP address and is not allowed.");
+            }
+        }
+    }
+
+    /**
+     * Check whether an IP address falls within a CIDR range.
+     */
+    private function ipInCidr(string $ip, string $cidr): bool
+    {
+        [$range, $prefix] = explode('/', $cidr);
+        $prefix = (int) $prefix;
+
+        if (str_contains($cidr, ':')) {
+            // IPv6
+            $ipBin    = inet_pton($ip);
+            $rangeBin = inet_pton($range);
+            if ($ipBin === false || $rangeBin === false) {
+                return false;
+            }
+            $ipInt    = gmp_import($ipBin);
+            $rangeInt = gmp_import($rangeBin);
+            $mask     = gmp_sub(gmp_pow(2, 128), gmp_pow(2, 128 - $prefix));
+            return gmp_cmp(gmp_and($ipInt, $mask), gmp_and($rangeInt, $mask)) === 0;
+        }
+
+        // IPv4
+        $ipLong    = ip2long($ip);
+        $rangeLong = ip2long($range);
+        if ($ipLong === false || $rangeLong === false) {
+            return false;
+        }
+        $maskLong = $prefix === 0 ? 0 : (~0 << (32 - $prefix));
+        return ($ipLong & $maskLong) === ($rangeLong & $maskLong);
+    }
+
+    /**
      * Upload from a URL (download and upload).
      *
      * @param string $key Object key
      * @param string $url Source URL
      * @param UploadOptions|null $options Upload options
      * @return string Public URL
+     * @throws \InvalidArgumentException if the URL fails SSRF validation
      */
     public function uploadFromUrl(string $key, string $url, ?UploadOptions $options = null): string
     {
+        $this->validateUrl($url);
+
         $stream = fopen($url, 'rb');
         if ($stream === false) {
             throw new \RuntimeException("Cannot open URL: $url");

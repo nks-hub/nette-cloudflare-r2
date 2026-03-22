@@ -28,7 +28,7 @@ class CacheStorage implements IStorage
     {
         try {
             $data = $this->client->get($this->prefix . $this->sanitizeKey($key));
-            $decoded = @unserialize($data);
+            $decoded = @unserialize($data, ['allowed_classes' => false]);
 
             if ($decoded === false) {
                 return null;

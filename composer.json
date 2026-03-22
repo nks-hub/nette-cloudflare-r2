@@ -21,12 +21,12 @@
     ],
     "homepage": "https://github.com/nks-hub/nette-cloudflare-r2",
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.1",
         "nette/di": "^3.0",
         "nette/schema": "^1.2",
         "nette/utils": "^3.2 || ^4.0",
         "nette/http": "^3.0",
-        "aws/aws-sdk-php": "^3.0 <3.280"
+        "aws/aws-sdk-php": "^3.0 <4.0"
     },
     "require-dev": {
         "nette/tester": "^2.4",
