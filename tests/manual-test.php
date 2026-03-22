@@ -15,11 +15,11 @@ use NksHub\NetteCloudflareR2\Client\R2Client;
 use NksHub\NetteCloudflareR2\Storage\UploadOptions;
 use NksHub\NetteCloudflareR2\Api\CloudflareApi;
 
-// Configuration - update these values
-$accountId = 'your-account-id';
-$accessKeyId = 'your-access-key-id';
-$secretAccessKey = 'your-secret-access-key';
-$bucket = 'your-bucket-name'; // Change to your bucket name
+// Configuration - set via environment variables
+$accountId = getenv('R2_ACCOUNT_ID') ?: 'your-account-id';
+$accessKeyId = getenv('R2_ACCESS_KEY_ID') ?: 'your-access-key-id';
+$secretAccessKey = getenv('R2_SECRET_ACCESS_KEY') ?: 'your-secret-access-key';
+$bucket = getenv('R2_BUCKET') ?: 'your-bucket-name';
 $jurisdiction = 'eu';
 
 echo "=== Nette Cloudflare R2 Manual Test ===\n\n";
