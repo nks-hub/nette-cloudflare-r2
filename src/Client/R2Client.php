@@ -692,7 +692,8 @@ class R2Client
 
     private function convertException(S3Exception $e): R2Exception
     {
-        $statusCode = $e->getStatusCode();
+        // Connection-level failures have no HTTP response -> null status code.
+        $statusCode = $e->getStatusCode() ?? 0;
         $awsCode = $e->getAwsErrorCode();
         $message = $e->getMessage();
 

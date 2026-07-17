@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-07-17
+
+### Fixed
+
+- `R2Client::convertException()` crashed with a `TypeError` when the underlying
+  `S3Exception` carried no HTTP response (e.g. cURL/SSL connection failures),
+  masking the original error. Null status codes now default to `0`.
+
+## [1.1.0] - 2026-07-17
+
+### Fixed
+
+- SSRF protection and safe unserialize
+- Hardcoded R2 credentials in tests replaced with environment variables
+- Updated PHP version constraint
+
 ## [1.0.0] - 2025-01-23
 
 ### Added
