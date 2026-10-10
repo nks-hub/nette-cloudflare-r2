@@ -6,18 +6,18 @@
 [![Nette Version](https://img.shields.io/badge/nette-%5E3.0-blue.svg)](https://nette.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Cloudflare R2 storage integration for Nette Framework with full S3-compatible API support.
+Nette DI extension and PHP client for Cloudflare R2: object operations over the S3 API (AWS SDK for PHP) plus the Cloudflare REST API for custom domains, event notifications and metrics.
 
 ## Features
 
-- 🚀 **Full S3-compatible API** - Upload, download, delete, copy, list objects
-- 📦 **Multipart uploads** - Automatic chunked upload for large files
-- 🔗 **Presigned URLs** - Generate temporary access URLs (up to 7 days)
+- 🚀 **Object operations** - Upload, download, delete, copy, list and count objects, read and set metadata
+- 📦 **Multipart uploads** - Files over 100 MB switch to multipart automatically (8 MB parts by default); manual API and progress callback available
+- 🔗 **Presigned URLs** - Temporary download and upload URLs, valid for up to 7 days
 - 🎯 **Nette integration** - DI extension, FileUpload support, Tracy panel
-- 💾 **Storage classes** - Standard and Infrequent Access support
-- 🔄 **Lifecycle rules** - Automatic expiration and transitions
+- 💾 **Storage classes** - `STANDARD` and `STANDARD_IA`, set per upload, per bucket or changed later
+- 🔄 **Lifecycle rules** - Per-prefix expiration, transition to Infrequent Access, abort of incomplete multipart uploads
 - 🌐 **Cloudflare API** - Custom domains, event notifications, metrics
-- 🛡️ **Type-safe** - Full PHP 8.1+ support with strict types
+- 🛡️ **Strict types** - `declare(strict_types=1)` in every source file, PHP 8.1+
 
 ## Requirements
 
@@ -33,7 +33,7 @@ composer require nks-hub/nette-cloudflare-r2
 
 ## Configuration
 
-### Basic Setup
+### Basic setup
 
 Register the extension in your `config.neon`:
 
@@ -48,7 +48,7 @@ r2:
     defaultBucket: 'my-bucket'
 ```
 
-### Full Configuration
+### Full configuration
 
 ```neon
 r2:
@@ -87,7 +87,7 @@ r2:
 
 ## Usage
 
-### Basic Operations
+### Basic operations
 
 ```php
 use NksHub\NetteCloudflareR2\Client\R2Client;
@@ -129,7 +129,7 @@ class MyPresenter extends Nette\Application\UI\Presenter
 }
 ```
 
-### File Upload Integration
+### File upload integration
 
 ```php
 use Nette\Http\FileUpload;
@@ -164,7 +164,7 @@ class GalleryPresenter extends Nette\Application\UI\Presenter
 }
 ```
 
-### Upload Options
+### Upload options
 
 ```php
 use NksHub\NetteCloudflareR2\Storage\UploadOptions;
@@ -197,7 +197,7 @@ if ($presignedUrl->isExpired()) {
 }
 ```
 
-### Listing Objects
+### Listing objects
 
 ```php
 // List with pagination
@@ -221,7 +221,7 @@ foreach ($r2->listAll('images/') as $object) {
 $count = $r2->count('images/');
 ```
 
-### Multiple Buckets
+### Multiple buckets
 
 ```php
 use NksHub\NetteCloudflareR2\Client\R2ClientFactory;
@@ -245,7 +245,7 @@ class MyService
 }
 ```
 
-### Copy and Metadata
+### Copy and metadata
 
 ```php
 // Copy object
@@ -258,7 +258,7 @@ $r2->setMetadata('file.jpg', ['version' => '2']);
 $r2->changeStorageClass('archive.zip', StorageClass::INFREQUENT_ACCESS);
 ```
 
-### Multipart Upload (Large Files)
+### Multipart upload
 
 ```php
 // Automatic multipart for large files (>100MB by default)
@@ -286,7 +286,7 @@ $uploader->onProgress(function (int $uploaded, int $total) {
 $url = $uploader->upload('huge-file.zip', '/local/path/huge-file.zip');
 ```
 
-### Lifecycle Rules
+### Lifecycle rules
 
 ```php
 // Add expiration rule (delete after 90 days)
@@ -309,7 +309,7 @@ $rules = $r2->lifecycle()->get();
 $r2->lifecycle()->removeRule('expire-logs-90d');
 ```
 
-### Bucket Operations
+### Bucket operations
 
 ```php
 // List buckets
@@ -332,7 +332,7 @@ $r2->buckets()->setCors([
 ]);
 ```
 
-### Cloudflare API (Extended Features)
+### Cloudflare API
 
 ```php
 use NksHub\NetteCloudflareR2\Api\CloudflareApi;
@@ -365,7 +365,7 @@ $creds = $api->createTempCredentials(
 );
 ```
 
-### Stream Operations
+### Stream operations
 
 ```php
 use NksHub\NetteCloudflareR2\Upload\StreamUploader;
@@ -387,18 +387,18 @@ $response = $streamDownloader->createFileResponse('file.pdf', 'download.pdf');
 $this->sendResponse($response);
 ```
 
-### Tracy Debugger Panel
+### Tracy panel
 
-When `tracy: true` is enabled, you'll see R2 statistics in the Tracy bar:
+With `tracy: true` the Tracy bar shows:
 - Total operations count
 - Uploads/downloads/deletes
 - Bytes transferred
 - Error count
 - Configuration details
 
-## Storage Classes
+## Storage classes
 
-| Class | Use Case | Retrieval Fee |
+| Class | Use case | Retrieval fee |
 |-------|----------|---------------|
 | `STANDARD` | Frequently accessed data | None |
 | `STANDARD_IA` | Infrequently accessed data | Yes |
@@ -410,7 +410,7 @@ $options = UploadOptions::create()
     ->withStorageClass(StorageClass::INFREQUENT_ACCESS);
 ```
 
-## Error Handling
+## Error handling
 
 ```php
 use NksHub\NetteCloudflareR2\Exception\R2Exception;
@@ -433,18 +433,18 @@ try {
 }
 ```
 
-## R2 Pricing Benefits
+## R2 pricing
 
-Cloudflare R2 offers significant cost savings:
+List prices from the [R2](https://developers.cloudflare.com/r2/pricing/) and [S3](https://aws.amazon.com/s3/pricing/) pricing pages at the time of writing (S3 Standard). Check the current pages before relying on them.
 
 | Feature | R2 | AWS S3 |
 |---------|-----|--------|
 | Storage | $0.015/GB | $0.023/GB |
-| Egress | **$0 (FREE!)** | $0.09/GB |
+| Egress | $0 | $0.09/GB |
 | Class A ops | $4.50/million | $5.00/million |
 | Class B ops | $0.36/million | $0.40/million |
 
-**Free tier**: 10 GB storage, 1M Class A ops, 10M Class B ops per month.
+R2 free tier: 10 GB storage, 1M Class A ops and 10M Class B ops per month.
 
 ## Testing
 
