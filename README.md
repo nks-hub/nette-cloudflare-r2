@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://poser.pugx.org/nks-hub/nette-cloudflare-r2/v)](https://packagist.org/packages/nks-hub/nette-cloudflare-r2)
 [![Total Downloads](https://poser.pugx.org/nks-hub/nette-cloudflare-r2/downloads)](https://packagist.org/packages/nks-hub/nette-cloudflare-r2)
-[![PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-8892BF.svg)](https://php.net/)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-8892BF.svg)](https://php.net/)
 [![Nette Version](https://img.shields.io/badge/nette-%5E3.0-blue.svg)](https://nette.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -17,11 +17,11 @@ Cloudflare R2 storage integration for Nette Framework with full S3-compatible AP
 - 💾 **Storage classes** - Standard and Infrequent Access support
 - 🔄 **Lifecycle rules** - Automatic expiration and transitions
 - 🌐 **Cloudflare API** - Custom domains, event notifications, metrics
-- 🛡️ **Type-safe** - Full PHP 7.4+ / 8.x support with strict types
+- 🛡️ **Type-safe** - Full PHP 8.1+ support with strict types
 
 ## Requirements
 
-- PHP 7.4 or higher
+- PHP 8.1 or higher
 - Nette Framework 3.x
 - Cloudflare R2 account with API credentials
 
