@@ -102,9 +102,11 @@ class ChunkedUploader
             }
 
             $this->multipart->complete($key, $uploadId, $parts);
+            $this->client->recordUpload($fileSize);
 
             return $this->client->getPublicUrl($key);
         } catch (\Throwable $e) {
+            $this->client->recordUpload(0, failed: true);
             $this->multipart->abort($key, $uploadId);
             throw $e;
         }
@@ -179,11 +181,15 @@ class ChunkedUploader
                     ($this->progressCallback)($uploaded, $fileSize);
                 }
             }
+
+            $this->multipart->complete($key, $uploadId, $parts);
+            $this->client->recordUpload($uploaded - $uploadedBytes);
+        } catch (\Throwable $e) {
+            $this->client->recordUpload(0, failed: true);
+            throw $e;
         } finally {
             fclose($handle);
         }
-
-        $this->multipart->complete($key, $uploadId, $parts);
 
         return $this->client->getPublicUrl($key);
     }

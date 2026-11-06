@@ -52,6 +52,61 @@ final class ErrorCode
     public const CLIENT_DISCONNECTED = 10054;
     public const RATE_LIMIT_EXCEEDED = 10058;
 
+    /** S3 error code names returned by R2 mapped to the numeric R2 codes. */
+    private const S3_NAMES = [
+        'InternalError' => self::INTERNAL_ERROR,
+        'Unauthorized' => self::INVALID_CREDENTIALS,
+        'InvalidAccessKeyId' => self::INVALID_CREDENTIALS,
+        'AccessDenied' => self::ACCESS_DENIED,
+        'InvalidBucketName' => self::INVALID_BUCKET_NAME,
+        'NoSuchBucket' => self::BUCKET_NOT_FOUND,
+        'NoSuchKey' => self::OBJECT_NOT_FOUND,
+        'BucketNotEmpty' => self::BUCKET_NOT_EMPTY,
+        'TooManyBuckets' => self::BUCKET_LIMIT_EXCEEDED,
+        'EntityTooSmall' => self::PART_TOO_SMALL,
+        'MetadataTooLarge' => self::METADATA_TOO_LARGE,
+        'IncompleteBody' => self::INCOMPLETE_BODY,
+        'InvalidDigest' => self::INVALID_CHECKSUM_HEADER,
+        'ExpiredRequest' => self::SIGNATURE_EXPIRED,
+        'ExpiredToken' => self::SIGNATURE_EXPIRED,
+        'InvalidObjectName' => self::INVALID_OBJECT_KEY,
+        'KeyTooLongError' => self::INVALID_OBJECT_KEY,
+        'NoSuchUpload' => self::MULTIPART_NOT_FOUND,
+        'InvalidPart' => self::PARTS_MISSING,
+        'PreconditionFailed' => self::PRECONDITION_FAILED,
+        'MissingContentLength' => self::MISSING_CONTENT_LENGTH,
+        'SignatureDoesNotMatch' => self::SIGNATURE_MISMATCH,
+        'BadDigest' => self::CHECKSUM_MISMATCH,
+        'InvalidRange' => self::INVALID_RANGE,
+        'NotEntitled' => self::FEATURE_NOT_ENTITLED,
+        'ServiceUnavailable' => self::SERVICE_UNAVAILABLE,
+        'ClientDisconnect' => self::CLIENT_DISCONNECTED,
+        'SlowDown' => self::RATE_LIMIT_EXCEEDED,
+        'TooManyRequests' => self::RATE_LIMIT_EXCEEDED,
+        'ObjectLockedByBucketPolicy' => self::OBJECT_LOCKED,
+        'BucketAlreadyExists' => self::BUCKET_ALREADY_EXISTS,
+        'BucketAlreadyOwnedByYou' => self::BUCKET_ALREADY_EXISTS,
+        'EntityTooLarge' => self::OBJECT_TOO_LARGE,
+    ];
+
+    /**
+     * Resolve the numeric R2 error code from an S3 error code name, falling back to the HTTP status.
+     * Returns 0 when nothing matches.
+     */
+    public static function fromS3Error(?string $s3Code, int $httpStatus = 0): int
+    {
+        if ($s3Code !== null && isset(self::S3_NAMES[$s3Code])) {
+            return self::S3_NAMES[$s3Code];
+        }
+
+        return match ($httpStatus) {
+            401 => self::INVALID_CREDENTIALS,
+            403 => self::ACCESS_DENIED,
+            429 => self::RATE_LIMIT_EXCEEDED,
+            default => 0,
+        };
+    }
+
     /**
      * Get exception class for specific error code.
      *

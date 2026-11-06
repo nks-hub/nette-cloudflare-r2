@@ -29,3 +29,6 @@ Thumbs.db
 # Temp
 /temp/
 *.log
+
+# Composer binary
+/composer.phar

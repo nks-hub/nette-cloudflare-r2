@@ -15,6 +15,7 @@ use NksHub\NetteCloudflareR2\Api\ObjectOperations;
 use NksHub\NetteCloudflareR2\Api\PresignedUrlGenerator;
 use NksHub\NetteCloudflareR2\Exception\ErrorCode;
 use NksHub\NetteCloudflareR2\Exception\R2Exception;
+use NksHub\NetteCloudflareR2\Exception\RateLimitException;
 use NksHub\NetteCloudflareR2\Storage\ObjectMetadata;
 use NksHub\NetteCloudflareR2\Storage\StorageClass;
 use NksHub\NetteCloudflareR2\Storage\UploadOptions;
@@ -92,7 +93,10 @@ class R2Client
             $size = is_string($body) ? strlen($body) : $this->getStreamSize($body);
 
             if ($options->isAutoMultipart() && $size > 100 * 1024 * 1024) { // 100MB
-                return $this->multipart()->uploadLarge($key, $body, $options);
+                $url = $this->multipart()->uploadLarge($key, $body, $options);
+                $this->stats['bytesUploaded'] += $size;
+
+                return $url;
             }
 
             $this->objects()->put($key, $body, $options);
@@ -603,6 +607,23 @@ class R2Client
     }
 
     /**
+     * Record an upload performed outside of upload() (used by ChunkedUploader).
+     *
+     * @internal
+     */
+    public function recordUpload(int $bytes, bool $failed = false): void
+    {
+        $this->stats['operations']++;
+        $this->stats['uploads']++;
+
+        if ($failed) {
+            $this->stats['errors']++;
+        } else {
+            $this->stats['bytesUploaded'] += $bytes;
+        }
+    }
+
+    /**
      * Reset operation statistics.
      */
     public function resetStats(): void
@@ -697,11 +718,14 @@ class R2Client
         $awsCode = $e->getAwsErrorCode();
         $message = $e->getMessage();
 
-        // Try to extract R2 error code from response
-        $r2Code = 0;
-
-        // Map common S3 errors to R2 exceptions
+        $r2Code = ErrorCode::fromS3Error($awsCode, $statusCode);
         $exceptionClass = ErrorCode::getExceptionClass($r2Code);
+
+        if ($exceptionClass === RateLimitException::class) {
+            $retryAfter = (int) ($e->getResponse()?->getHeaderLine('Retry-After') ?? '');
+
+            return new RateLimitException($message, $r2Code, $statusCode ?: 429, max(1, $retryAfter), $e);
+        }
 
         return new $exceptionClass($message, $r2Code, $statusCode, $e);
     }

@@ -36,6 +36,10 @@
     "suggest": {
         "tracy/tracy": "For Tracy debugger panel integration"
     },
+    "scripts": {
+        "test": "tester -C tests",
+        "phpstan": "phpstan analyse"
+    },
     "autoload": {
         "psr-4": {
             "NksHub\\NetteCloudflareR2\\": "src/"

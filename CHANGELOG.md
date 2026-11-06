@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-11-06
+
+### Fixed
+
+- `R2Client::convertException()` always returned the generic `R2Exception` with error code `0`.
+  It now maps the S3 error code (and, failing that, the HTTP status) to the R2 numeric code, so
+  `ObjectException`, `BucketException`, `AuthenticationException`, `UploadException` and
+  `RateLimitException` are thrown as documented and `getR2ErrorCode()` returns e.g. `10007`.
+  `RateLimitException::getRetryAfter()` reads the `Retry-After` header.
+- `R2Client::getStats()` now counts uploads made through `ChunkedUploader`, including failed ones,
+  and the bytes of auto-multipart uploads over 100 MB.
+- PHPStan (level 6) passes: the ignore pattern for `Cannot access property` now matches the
+  `array<string, mixed>|object` wording of current PHPStan 1.x.
+- `composer.phar` is no longer tracked and is listed in `.gitignore`.
+- Release dates of 1.0.0 and 1.1.0 now match the git tags.
+
+### Added
+
+- Unit tests for exception mapping and statistics (mocked S3 handler, no network).
+
 ## [1.1.1] - 2026-07-17
 
 ### Fixed
@@ -13,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `S3Exception` carried no HTTP response (e.g. cURL/SSL connection failures),
   masking the original error. Null status codes now default to `0`.
 
-## [1.1.0] - 2026-07-17
+## [1.1.0] - 2026-03-22
 
 ### Fixed
 
@@ -21,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hardcoded R2 credentials in tests replaced with environment variables
 - Updated PHP version constraint
 
-## [1.0.0] - 2025-01-23
+## [1.0.0] - 2026-01-24
 
 ### Added
 
